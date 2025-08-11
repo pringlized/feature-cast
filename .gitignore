@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Claude-specific
+.claude/
+
+# Test coverage
+coverage/
+*.lcov
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.log
+tmp/
+temp/
+
+# Audio output files (if you want to exclude test outputs)
+# *.wav
+# *.mp3
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Package lock files (include one or the other based on preference)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

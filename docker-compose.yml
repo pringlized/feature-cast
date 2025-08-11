@@ -1,0 +1,19 @@
+services:
+  # Piper Text-to-Speech Server
+  tts-server:
+    image: rhasspy/wyoming-piper
+    container_name: base-tts-server
+    networks:
+      - base-network
+    restart: always
+    ports:
+      - "10200:10200"  # Wyoming protocol
+      - "5000:5000"    # HTTP API
+    volumes:
+      - piper_models:/data
+    command: --voice en_US-danny-low
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:10200 || exit 1"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
