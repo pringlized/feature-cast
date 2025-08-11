@@ -2,7 +2,7 @@
 
 **Turn technical reports into audio summaries**
 
-FeatureCast is an AI agent that converts engineering reports and technical documentation into audio segments. Built with Claude but works with any LLM that supports custom agents, it uses an investigative journalism approach to compare what was built against what was specified, then generates scripts optimized for text-to-speech.
+FeatureCast is an AI agent system-prompt with simple mcp-server that converts engineering reports and technical documentation into audio segments. Built with Claude but works with any LLM that supports custom agents, it uses an investigative journalism approach to compare what was built against what was specified, then generates scripts optimized for text-to-speech.
 
 ## What It Does
 
