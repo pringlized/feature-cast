@@ -1,5 +1,5 @@
-// Main entry point for Audio Cast MCP
-export { AudioCastMCPServer } from './server';
+// Main entry point for FeatureCast MCP
+export { FeatureCastMCPServer } from './server';
 export * from './tools';
 
 // Start server if this is the main module

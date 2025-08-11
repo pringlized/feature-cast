@@ -1,37 +1,30 @@
 {
-  "name": "@planning/audio-cast-mcp",
+  "name": "featurecast-mcp",
   "version": "1.0.0",
-  "description": "MCP tool for generating audio casts with TTS and ffmpeg",
+  "description": "MCP server for generating audio casts from text transcripts using TTS and ffmpeg",
   "main": "dist/index.js",
   "bin": {
-    "audio-cast-mcp": "./bin/audio-cast-mcp.js"
+    "featurecast-mcp": "./bin/featurecast-mcp.js"
   },
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "tsc && node dist/server.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "dev": "tsc && node dist/server.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "dotenv": "^17.2.1"
   },
   "devDependencies": {
-    "@jest/globals": "^29.7.0",
-    "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.1.0",
     "typescript": "^5.0.0"
   },
   "keywords": [
     "mcp",
-    "ai",
     "audio",
     "tts",
     "ffmpeg",
+    "featurecast",
     "claude"
   ],
   "files": [
@@ -40,9 +33,9 @@
     "README.md"
   ],
   "license": "MIT",
-  "author": "Planning System",
+  "author": "FeatureCast",
   "repository": {
     "type": "git",
-    "url": "https://github.com/planning/audio-cast-mcp.git"
+    "url": "https://github.com/yourusername/featurecast.git"
   }
 }

@@ -4,7 +4,7 @@
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-// Explicitly load .env from the issue-mcp directory
+// Explicitly load .env from the featurecast-mcp directory
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 // Verify critical environment variables are loaded
@@ -22,7 +22,7 @@ import {
 import { getAllTools } from './tools';
 import { checkFFmpegAvailable, checkTTSAvailable } from './tools/generate-audio-cast';
 
-export class AudioCastMCPServer {
+export class FeatureCastMCPServer {
   private server: Server;
   private tools: Map<string, any> = new Map();
   private audioToolsAvailable: boolean = true;
@@ -30,7 +30,7 @@ export class AudioCastMCPServer {
   constructor() {
     this.server = new Server(
       {
-        name: 'audio-cast-mcp',
+        name: 'featurecast-mcp',
         version: '1.0.0',
       },
       {
@@ -163,19 +163,19 @@ export class AudioCastMCPServer {
     // Connect and run
     await this.server.connect(transport);
     if (process.env.MCP_MODE !== 'true') {
-      console.error('Audio Cast MCP Server started on stdio');
+      console.error('FeatureCast MCP Server started on stdio');
     }
   }
 
   async stop() {
     await this.server.close();
-    console.error('Audio Cast MCP Server stopped');
+    console.error('FeatureCast MCP Server stopped');
   }
 }
 
 // Start server if run directly
 if (require.main === module) {
-  const server = new AudioCastMCPServer();
+  const server = new FeatureCastMCPServer();
   
   server.start().catch((error) => {
     console.error('Failed to start server:', error);

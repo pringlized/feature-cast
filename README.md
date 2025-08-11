@@ -1,134 +1,206 @@
 ![FeatureCast Header](images/featurecast-header.png)
 
-**Transform dense technical reports into compelling audio narratives**
+**Turn technical reports into audio summaries**
 
-FeatureCast is an AI-powered investigative journalism agent that converts lengthy engineering reports into NPR-style audio segments. Instead of reading through pages of technical documentation, listen to professionally-narrated summaries that highlight what actually got built versus what was specified.
+FeatureCast is an AI agent that converts engineering reports and technical documentation into audio segments. Built with Claude but works with any LLM that supports custom agents, it uses an investigative journalism approach to compare what was built against what was specified, then generates scripts optimized for text-to-speech.
 
-## The Problem
+## What It Does
 
-- Engineering reports are long, dense, and time-consuming to read
-- Hard to quickly understand what was actually delivered vs. requirements
-- Technical updates pile up faster than you can review them
-- Need to consume project updates while multitasking
+Engineering reports are dense and time-consuming. FeatureCast helps by:
 
-## The Solution
-
-FeatureCast transforms your technical reports into **investigative audio journalism**:
-
-1. **Comparative Analysis**: Audits engineer reports against original specifications (PRPs)
-2. **Narrative Generation**: Creates flowing, NPR-style scripts optimized for audio
-3. **Text-to-Speech**: Converts scripts to professional-quality audio segments
-4. **Podcast-Style Consumption**: Listen to technical updates like news segments
+- Comparing implementation reports against specifications
+- Identifying gaps and questioning unstated assumptions
+- Creating audio-friendly scripts in an NPR-style narrative format
+- Converting to audio via text-to-speech for hands-free listening
 
 ## How It Works
 
 ```
-Technical Specification (PRP) ──┐
-                                ├─► FeatureCast Agent ──► Audio Script ──► TTS ──► Audio Segment
+Technical Specification ────────┐
+                                ├─► FeatureCast Agent ──► Audio Script ──► TTS ──► Audio File
 Engineering Report ─────────────┘
 ```
 
-The agent doesn't just summarize—it **investigates**:
-- Compares what was specified vs. what was delivered
-- Identifies gaps, risks, and architectural decisions
-- Explains the "so what?" behind technical choices
-- Maintains professional skepticism throughout
+The agent acts as a technical correspondent, analyzing documentation with professional skepticism. It doesn't just summarize—it investigates what's missing, questions claims, and explains why technical decisions matter.
 
-## Quick Start
+## Setup
 
-### 1. Set Up TTS Server (Wyoming-Piper)
+### Prerequisites
 
-```bash
-docker-compose up -d
-```
+1. **Docker** - For running the TTS server
+2. **Node.js 16+** - For the MCP server
+3. **ffmpeg** - For audio processing
+4. **Claude Desktop or similar** - For running the agent
 
-This starts a Wyoming-Piper text-to-speech server for converting scripts to audio.
+### Components
 
-### 2. Use the FeatureCast Agent
+The project includes:
 
-Provide the agent with:
-- **Technical Specification (PRP)**: What should have been built
-- **Engineer's Report**: What was actually built
+- **FeatureCast Agent** (`feature-caster-agent/`): The investigative journalist AI that generates scripts
+- **MCP Server** (`featurecast-mcp/`): Tool for converting scripts to audio files
+- **TTS Server** (`docker-compose.yml`): Wyoming-Piper for text-to-speech (easily swappable with ElevenLabs or other TTS services)
 
-The agent will generate an audio script in `feature-caster-agent/system-prompt.md` style.
+### Getting Started
 
-### 3. Convert to Audio
+1. **Start the TTS server:**
+   ```bash
+   docker-compose up -d
+   ```
+   This runs Wyoming-Piper on port 5000.
 
-Send the generated script to your TTS server to create the final audio segment.
+2. **Set up the MCP server:**
+   ```bash
+   cd featurecast-mcp
+   npm install
+   npm run build
+   ```
+   See `featurecast-mcp/README.md` for detailed MCP configuration with Claude Desktop.
+
+3. **Configure environment:**
+   Create `.env` in `featurecast-mcp/`:
+   ```bash
+   BASE_PROJECT_PATH=/path/to/your/project
+   TTS_SERVER_URL=http://localhost:5000/api/text-to-speech
+   TTS_VOICE=en_US-hfc_female-medium
+   TTS_TIMEOUT_MS=180000  # Adjust for transcript length
+   
+   # Audio padding (Piper TTS starts abruptly)
+   AUDIO_PREROLL_MS=750
+   AUDIO_POSTROLL_MS=1000
+   ```
+
+4. **Configure Claude Desktop:**
+   Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+   ```json
+   {
+     "mcpServers": {
+       "featurecast": {
+         "command": "node",
+         "args": ["/path/to/featurecast-mcp/dist/server.js"],
+         "env": {
+           "TTS_SERVER_URL": "http://localhost:5000/api/text-to-speech",
+           "BASE_PROJECT_PATH": "/path/to/your/project"
+         }
+       }
+     }
+   }
+   ```
+   Then restart Claude Desktop.
+
+## Example Workflow
+
+Here's a typical end-to-end flow:
+
+1. **You have technical docs:**
+   - `requirements.md` - What the feature should do
+   - `engineer-report.md` - What got built
+
+2. **Feed them to the FeatureCast agent:**
+   ```
+   "I have a PRP spec and an engineer's implementation report. 
+   Can you analyze these and create an audio script comparing 
+   what was supposed to be built vs what actually got built?"
+   ```
+
+3. **Agent generates a script:**
+   The agent produces something like:
+   ```
+   Engineering Report. Today we're examining the authentication 
+   system implementation... The specification called for OAuth2 
+   with refresh tokens, but our investigation reveals the engineer 
+   opted for simpler JWT tokens... Let's explore why this matters...
+   ```
+
+4. **Convert to audio via MCP:**
+   The MCP tool `generate_audio_cast` takes the script and:
+   - Sends it to the TTS server
+   - Adds pre/post-roll silence with ffmpeg
+   - Saves both the script and audio files
+
+5. **Listen to your technical update:**
+   You get a `.wav` file that sounds like an NPR segment about your code.
 
 ## Example Output
 
-Check out `example-output/` to see:
-- **`.md` file**: The generated audio script (optimized for speech)
-- **`.wav` file**: The final audio segment from TTS
+The `example-output/` directory contains:
+- Sample script files (`.md`) - Narrative text optimized for speech
+- Audio files (`.wav`) - The final TTS output
 
-## Agent Features
+## Agent Capabilities
 
-### Investigative Approach
-- Compares specifications against implementation
-- Questions claims and identifies evidence gaps
-- Explains technical trade-offs and their implications
-- Maintains calm, authoritative NPR-style tone
+### Investigative Analysis
+The agent approaches documentation like an NPR correspondent:
+- Compares specs against implementation
+- Questions missing information
+- Explains technical implications
+- Maintains professional skepticism
 
-### Audio-Optimized Writing
-- No bullet points or headers in output
-- Flowing narrative with verbal transitions
-- Spelled-out acronyms and technical terms
-- Natural speech patterns and pacing
+### Audio-Optimized Output
+Scripts are written specifically for listening:
+- Continuous narrative flow (no bullets or headers)
+- Natural speech transitions
+- Spelled-out acronyms on first use
+- Pacing markers with ellipses
 
 ### Learning System
-The agent improves over time through `INSIGHTS.md`:
-- Captures effective narrative techniques
-- Builds a library of proven analogies
-- Tracks what communication patterns work best
-- Avoids documented anti-patterns
+The agent improves through `INSIGHTS.md`, building a library of:
+- Effective narrative techniques
+- Proven analogies and explanations
+- Communication patterns that work
+- Anti-patterns to avoid
 
 ## Repository Structure
 
 ```
-├── docker-compose.yml              # Wyoming-Piper TTS server setup
-├── example-output/                 # Sample script and audio files
+├── docker-compose.yml              # TTS server configuration
+├── example-output/                 # Sample scripts and audio
 ├── feature-caster-agent/
-│   ├── system-prompt.md           # Complete agent instructions
-│   └── INSIGHTS.md                # Learning library for narrative techniques
-└── README.md                      # This file
+│   ├── system-prompt.md           # Agent instructions
+│   └── INSIGHTS.md                # Learning library
+├── featurecast-mcp/               # MCP server for audio generation
+│   ├── src/                       # TypeScript source
+│   ├── README.md                  # MCP setup guide
+│   └── package.json
+└── images/                        # Documentation assets
 ```
 
 ## Use Cases
 
-- **Engineering Teams**: Convert sprint reports into listenable updates
-- **Technical Leadership**: Stay informed on project progress during commutes
-- **Code Reviews**: Transform complex technical analysis into digestible audio
-- **Documentation**: Make architectural decisions and trade-offs more accessible
-- **Training**: Create audio explanations of technical implementations
+- Sprint report reviews during commutes
+- Technical documentation for visual fatigue
+- Architecture decision records as audio
+- Code review summaries for team updates
+- Onboarding materials in audio format
 
 ## Why Audio?
 
-- **Multitasking**: Listen while commuting, exercising, or doing other work
-- **Retention**: Audio narrative often more engaging than dense text
-- **Accessibility**: Easier consumption for visual processing fatigue
-- **Speed**: Faster than reading, especially for complex technical content
-- **Context**: Investigative approach provides deeper understanding than summaries
+Audio documentation offers some advantages:
+- Listen while doing other tasks
+- Different cognitive processing than reading
+- Good for complex technical narratives
+- Useful when screen time needs limiting
 
-## Technical Requirements
+## Technical Details
 
-- **TTS Server**: Wyoming-Piper (included in docker-compose.yml)
-- **AI Agent**: Compatible with Claude, GPT-4, or similar language models
-- **Input Format**: Technical specifications and engineering reports
-- **Output Format**: Markdown scripts + WAV/MP3 audio files
+- **TTS**: Wyoming-Piper server (Docker) - swap with ElevenLabs API for higher quality
+- **MCP**: Model Context Protocol for Claude Desktop integration
+- **Audio Processing**: ffmpeg for pre/post-roll silence
+- **Input**: Markdown/text technical documentation
+- **Output**: WAV audio files with narrative scripts
+- **Agent Compatibility**: Built with Claude, works with GPT-4, Gemini, or any LLM that supports custom instructions
 
 ## Contributing
 
-FeatureCast improves through usage and feedback:
-- Share effective narrative patterns in `INSIGHTS.md`
-- Contribute audio examples from your technical reports
+The project evolves through usage:
+- Share narrative techniques that work well
+- Contribute example outputs
 - Suggest improvements to the investigative approach
-- Help expand the agent's communication techniques
+- Help refine the audio optimization
 
 ## License
 
-MIT License - Feel free to adapt for your team's technical communication needs.
+MIT License
 
 ---
 
-**Transform your technical documentation from required reading into compelling listening.**
+*Making technical documentation listenable, one report at a time.*
